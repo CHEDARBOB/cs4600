@@ -6,6 +6,16 @@
 #include <fstream>
 #include <cmath>
 
+float normalizingConstant(int x) {
+	float k = 0.0f;
+	if (x == 0) {
+		k = std::sqrt(2.0f) / 4;
+	}
+	else {
+		k = .5f;
+	}
+	return k;
+}
 #define M_PI 3.141592654f
 
 #define WAV_FILE "data/train.wav"
@@ -49,28 +59,22 @@ void DCT(const float* A, float* C, int size) //size of vector C?8
 	// takes a vector A and produce as output a vector C, the 1D Discrete Cosine Transform
 	// Use std::cos
 	float k; //normalization factor
-	float Q = 0.0f; //sum of DCT transform
-	for (int i = 0; i < size; i++) {
-		for (int j = 0; j < size; j++) {
-			if (A[j] == 0.0f) { continue; }
-			if (i == 0) {
-				k = std::sqrt(2.0f) / 4;
-			}
-			else {
-				k = .5f;
-			}
-			Q += A[j]*k*(std::cos((M_PI*i*(2*j + 1)) / 16)); //sum to one coeficient
+	for (int j = 0; j < size; j++) {
+		float Q = 0.0f; //sum of DCT transform
+		k = normalizingConstant(j);
+		for (int i = 0; i < size; i++) {
+			Q += A[i]*(std::cos((M_PI*j*(2*i + 1)) / 16)); //sum to one coeficient
 		}
-		*(C+i) = Q;
+		*(C+j) = k*Q;
 	}
 }
 void compress(float* C, int size, int m)
 {
 	// TODO: part of Homework Task 1
 	// sets last m element as zero
-	float a = 5.0f;
+	float a = 0.0f;
 	for (int i = 0; i < size; i++) {
-		if (i > size - m) {
+		if (i >= size - m) {
 			C[i] = 0.0f;
 		}
 		a = *(C + i);
@@ -82,19 +86,14 @@ void inverseDCT(const float* C, float* B, int size)
 	// takes a vector C and produce as output a vector B, the 1D inverse Discrete Cosine Transform
 	// Use std::cos
 	float k; //normalization factor
-	float Q = 0.0f; //sum of DCT transform
 	for (int i = 0; i < size; i++) {
+		float X = 0.0f; //sum of DCT inverse transform
 		for (int j = 0; j < size; j++) {
+			k = normalizingConstant(j);
 			if (C[j] == 0.0f) { continue; }
-			if (j == 0) {
-				k = std::sqrt(2.0f) / 4;
-			}
-			else {
-				k = .5f;
-			}
-			Q += C[j]*k*std::cos((M_PI*j*(2 * i + 1)) / 16);
+			X += C[j]*k*std::cos((M_PI*j*(2 * i + 1)) / 16);
 		}
-		*(B + i) = Q;
+		*(B + i) = X;
 	}
 }
 void processBlock(const float* A, float* B, int m)
