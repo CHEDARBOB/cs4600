@@ -55,9 +55,6 @@ int g_wav_size;
 
 void DCT(const float* A, float* C, int size) //size of vector C?8
 {
-	// TODO: part of Homework Task 1
-	// takes a vector A and produce as output a vector C, the 1D Discrete Cosine Transform
-	// Use std::cos
 	float k; //normalization factor
 	for (int j = 0; j < size; j++) {
 		float Q = 0.0f; //sum of DCT transform
@@ -70,8 +67,6 @@ void DCT(const float* A, float* C, int size) //size of vector C?8
 }
 void compress(float* C, int size, int m)
 {
-	// TODO: part of Homework Task 1
-	// sets last m element as zero
 	float a = 0.0f;
 	for (int i = 0; i < size; i++) {
 		if (i >= size - m) {
@@ -82,9 +77,6 @@ void compress(float* C, int size, int m)
 }
 void inverseDCT(const float* C, float* B, int size)
 {
-	// TODO: part of Homework Task 1
-	// takes a vector C and produce as output a vector B, the 1D inverse Discrete Cosine Transform
-	// Use std::cos
 	float k; //normalization factor
 	for (int i = 0; i < size; i++) {
 		float X = 0.0f; //sum of DCT inverse transform
