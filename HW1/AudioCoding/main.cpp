@@ -20,8 +20,8 @@ float normalizingConstant(int x) {
 
 #define WAV_FILE "data/train.wav"
 
-unsigned int g_windowWidth = 600;
-unsigned int g_windowHeight = 600;
+unsigned int g_windowWidth = 1200;
+unsigned int g_windowHeight = 1200;
 char* g_windowName = "HW1-Transform-Coding-Audio";
 
 GLFWwindow* g_window;
@@ -63,7 +63,7 @@ void DCT(const float* A, float* C, int size) //size of vector C?8
 		float Q = 0.0f; //sum of DCT transform
 		k = normalizingConstant(j);
 		for (int i = 0; i < size; i++) {
-			Q += A[i]*(std::cos((M_PI*j*(2*i + 1)) / 16)); //sum to one coeficient
+			Q += A[i]*(std::cos((M_PI*j*(2*i + 1)) / (2*size))); //sum to one coeficient
 		}
 		*(C+j) = k*Q;
 	}
@@ -91,7 +91,7 @@ void inverseDCT(const float* C, float* B, int size)
 		for (int j = 0; j < size; j++) {
 			k = normalizingConstant(j);
 			if (C[j] == 0.0f) { continue; }
-			X += C[j]*k*std::cos((M_PI*j*(2 * i + 1)) / 16);
+			X += C[j]*k*std::cos((M_PI*j*(2 * i + 1)) / (2 * size));
 		}
 		*(B + i) = X;
 	}
@@ -110,7 +110,7 @@ void processWAVSignal()
 	float *A, *B;
 
 	// compression amount (min: 0, max: 8)
-	const int m = 5;
+	const int m = 4;
 	
 	// processing data by 8
 	for (int i = 0; i < g_wav_size; i += 8)

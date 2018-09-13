@@ -8,8 +8,8 @@
 
 #define M_PI 3.141592654f
 
-unsigned int g_windowWidth = 600;
-unsigned int g_windowHeight = 600;
+unsigned int g_windowWidth = 1200;
+unsigned int g_windowHeight = 1200;
 char* g_windowName = "HW1-Transform-Coding-Image";
 
 #define IMAGE_FILE "data/cameraman.ppm"
@@ -33,15 +33,78 @@ void DCT(const float* A, float* C, int blockSize)
 {
 	// TODO: Homework Task 2 (see the PDF description)
 	// Use std::cos
+	float F = 0.0f; //DCT result
+	float c_u = 0.0f; //c(u)
+	float c_v = 0.0f; //c(v)
+	int index = 0;
+	for (int u = 0; u < blockSize; u++) {
+		for (int v = 0; v < blockSize; v++) {
+			F = 0.0f;
+			// what constant?
+			if (u == 0)
+				c_u = std::sqrt(2.0f) / 4;
+			else
+				c_u = 0.5f;
+			if (v == 0)
+				c_v = std::sqrt(2.0f) / 4;
+			else
+				c_v = 0.5f;
+			//DCT sum
+			for (int x = 0; x < blockSize; x++) {
+				for (int y = 0; y < blockSize; y++) {
+					F += (std::cos(((2 * x + 1)*u*M_PI) / 16))*(std::cos(((2 * y + 1)*v*M_PI) / (2 * blockSize))*A[x * 8 + y]);
+				}
+			}
+			//std::cout << "DCT values: " << F << std::endl;
+			C[index] = c_u*c_v*F;
+			index++;
+		}
+	}
 }
 void compress(float* C, int blockSize, int m)
 {
-	// TODO: Homework Task 2 (see the PDF description)
+	//Zero out bottom right corner.
+	for (int i = 0; i < blockSize; i++) {
+		for (int j = 0; j < blockSize; j++) {
+			if (i+j > m)
+				C[i * 8 + j] = 0.0f;
+		}
+	}
 }
 void inverseDCT(const float* C, float* B, int blockSize)
 {
 	// TODO: Homework Task 2 (see the PDF description)
 	// Use std::cos
+	float f = 0.0f; //DCT result
+	float c_u = 0.0f; //c(u)
+	float c_v = 0.0f; //c(v)
+	int index = 0;
+	for (int x = 0; x < blockSize; x++) {
+		for (int y = 0; y < blockSize; y++) {
+			f = 0.0f;
+			//DCT sum
+			for (int u = 0; u < blockSize; u++) {
+				for (int v = 0; v < blockSize; v++) {
+					// what constant?
+					if (u == 0)
+						c_u = std::sqrt(2.0f) / 4;
+					else
+						c_u = 0.5f;
+					if (v == 0)
+						c_v = std::sqrt(2.0f) / 4;
+					else
+						c_v = 0.5f;
+
+					f += c_u*c_v*(std::cos(((2 * x + 1)*u*M_PI) / 16))*(std::cos(((2 * y + 1)*v*M_PI) / (2 * blockSize))*C[u * 8 + v]);
+				}
+			}
+			//std::cout << "DCT values: " << F << std::endl;
+			B[index] = f;
+			if (C[index] != B[index])
+				//std::cout << "val1 " << C[index] << "\nval2 " << B[index] << std::endl;
+			index++;
+		}
+	}
 }
 
 void processBlock(const float* A, float* B, int m)
@@ -268,7 +331,7 @@ int main()
 {
 	loadImage();
 
-	int m = 1;	// TODO: change the parameter m from 1 to 16 to see different image quality
+	int m = 4;	// TODO: change the parameter m from 1 to 16 to see different image quality
 	processImage(g_luminance_data, g_compressed_luminance_data, m);	
 
 	writeImage();
