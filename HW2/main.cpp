@@ -158,13 +158,21 @@ void putPixel(int x, int y)
 }
 
 void drawLine(int x1, int y1, int x2, int y2)
-{
+{	
 	// Task 1
+	if (x1 > x2 || y1 > y2) {
+		int temp = x1;
+		int temp2 = y1;
+		x1 = x2;
+		x2 = temp;
+		y1 = y2;
+		y2 = temp2;
+	}
 	//Bresenham
-	// This will only do a line from left to right, bottom up.
-	std::cout << "derp" << std::endl;
-	if (x1 < x2 && std::abs(y2 - y1) < std::abs(x2 - x1) && y1 < y2) {
-		int dy, dx, incroment_0, incroment_1, D;
+	// This will only do a line from left to right, bottom up with slope of 45 deg.
+	int dy, dx, incroment_0, incroment_1, D;
+	if (x1 < x2 && std::abs(y2 - y1) < std::abs(x2 - x1) && (y1 < y2 || y1 == y2)) {
+		std::cout << "derp" << std::endl;
 		dy = y2 - y1;
 		dx = x2 - x1;
 		D = 2 * dy - dx;
@@ -175,12 +183,53 @@ void drawLine(int x1, int y1, int x2, int y2)
 		while (x1 < x2) {
 			if (D <= 0) {
 				D += incroment_0;
+			} else {
+				D += incroment_1;
+				y1 += 1;
+			}
+			x1 += 1;
+			putPixel(x1, y1);
+		}
+	}
+	//Vertical lines
+	else if ((x1 == x2) && (y1 < y2 || y1 > y2)) {
+		std::cout << "herp" << std::endl;
+		dy = y2 - y1;
+		dx = x2 - x1;
+		D = 2 * dy - dx;
+		incroment_0 = 2 * dy;
+		incroment_1 = 2 * (dy - dx);
+		putPixel(x1, y1);
+		//Trace the line
+		while (y1 < y2) {
+			if (D < 0) {
+				D += incroment_0;
+			} else {
+				D += incroment_1;
+				y1 += 1;
+			}
+			putPixel(x1, y1);
+		}
+	}
+	//negitive slope
+	else if (x1 > x2 && std::abs(y2 - y1) < std::abs(x2 - x1) && y1 < y2) {
+		std::cout << "herpderp" << std::endl;
+		dy = y2 - y1;
+		dx = x2 - x1;
+		D = 2 * dy - dx;
+		incroment_0 = 2 * dy;
+		incroment_1 = incroment_0 + (2*dx);
+		putPixel(x1, y1);
+		//Trace the line
+		while (y1 < y2) {
+			if (D <= 0) {
+				D += incroment_0;
 			}
 			else {
 				D += incroment_1;
 				y1 += 1;
 			}
-			x1 += 1;
+			x1 -= 1;
 			putPixel(x1, y1);
 		}
 	}
@@ -202,6 +251,18 @@ void drawImage()
 	drawLine(150, 310, 300, 410);
 	drawLine(300, 410, 450, 310);
 
+	//Testing unidirectional line drawing
+	drawLine(300, 410, 150, 310);
+	drawLine(450, 310, 300, 410);
+
+	drawLine(150, 310, 150, 10);
+	drawLine(450, 310, 450, 10);
+
+
+	drawLine(450, 10, 150, 10);
+	drawLine(450, 310, 150, 310);
+
+	// ------------------------------------
 	drawCircle(500, 500, 50);
 }
 
