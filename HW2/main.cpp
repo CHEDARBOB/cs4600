@@ -171,7 +171,7 @@ void drawLine(int x1, int y1, int x2, int y2)
 	//Bresenham
 	// This will only do a line from left to right, bottom up with slope of 45 deg.
 	int dy, dx, incroment_0, incroment_1, D;
-	if (x1 < x2 && std::abs(y2 - y1) < std::abs(x2 - x1) && (y1 < y2 || y1 == y2)) {
+	if (x1 < x2 && std::abs(y2 - y1) <= std::abs(x2 - x1) && (y1 < y2 || y1 == y2)) {
 		std::cout << "derp" << std::endl;
 		dy = y2 - y1;
 		dx = x2 - x1;
@@ -233,6 +233,28 @@ void drawLine(int x1, int y1, int x2, int y2)
 			putPixel(x1, y1);
 		}
 	}
+	//
+	if (x1 < x2 && std::abs(y2 - y1) > std::abs(x2 - x1) && y1 < y2) {
+		std::cout << "derp3" << std::endl;
+		dy = y2 - y1;
+		dx = x2 - x1;
+		D = 2 * dx - dy;
+		incroment_0 = 2 * dx;
+		incroment_1 = 2 * (dx - dy);
+		putPixel(x1, y1);
+		//Trace the line
+		while (x1 < x2) {
+			if (D <= 0) {
+				D += incroment_0;
+			}
+			else {
+				D += incroment_1;
+				x1 += 1;
+			}
+			y1 += 1;
+			putPixel(x1, y1);
+		}
+	}
 }
 
 void drawCircle(int x0, int y0, int R)
@@ -252,15 +274,9 @@ void drawImage()
 	drawLine(300, 410, 450, 310);
 
 	//Testing unidirectional line drawing
-	drawLine(300, 410, 150, 310);
-	drawLine(450, 310, 300, 410);
-
-	drawLine(150, 310, 150, 10);
-	drawLine(450, 310, 450, 10);
-
-
-	drawLine(450, 10, 150, 10);
-	drawLine(450, 310, 150, 310);
+	drawLine(150, 310, 160, 410);
+	drawLine(150, 310, 250, 410);
+	drawLine(150, 310, 250, 210);
 
 	// ------------------------------------
 	drawCircle(500, 500, 50);
