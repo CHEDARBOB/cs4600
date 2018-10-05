@@ -4,6 +4,7 @@
 #include <vector>
 #include <iostream>
 #include <fstream>
+#include <cmath>
 
 #define M_PI 3.141592654f
 
@@ -159,7 +160,30 @@ void putPixel(int x, int y)
 void drawLine(int x1, int y1, int x2, int y2)
 {
 	// Task 1
-	// This function should draw a line from pixel (x1, y1) to pixel (x2, y2)
+	//Bresenham
+	// This will only do a line from left to right, bottom up.
+	std::cout << "derp" << std::endl;
+	if (x1 < x2 && std::abs(y2 - y1) < std::abs(x2 - x1) && y1 < y2) {
+		int dy, dx, incroment_0, incroment_1, D;
+		dy = y2 - y1;
+		dx = x2 - x1;
+		D = 2 * dy - dx;
+		incroment_0 = 2 * dy;
+		incroment_1 = 2 * (dy - dx);
+		putPixel(x1, y1);
+		//Trace the line
+		while (x1 < x2) {
+			if (D <= 0) {
+				D += incroment_0;
+			}
+			else {
+				D += incroment_1;
+				y1 += 1;
+			}
+			x1 += 1;
+			putPixel(x1, y1);
+		}
+	}
 }
 
 void drawCircle(int x0, int y0, int R)
