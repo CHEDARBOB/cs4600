@@ -233,7 +233,7 @@ void drawLine(int x1, int y1, int x2, int y2)
 			putPixel(x1, y1);
 		}
 	}
-	//
+	//draw slop of <45 deg
 	if (x1 < x2 && std::abs(y2 - y1) > std::abs(x2 - x1) && y1 < y2) {
 		std::cout << "derp3" << std::endl;
 		dy = y2 - y1;
@@ -276,7 +276,10 @@ void drawImage()
 	//Testing unidirectional line drawing
 	drawLine(150, 310, 160, 410);
 	drawLine(150, 310, 250, 410);
-	drawLine(150, 310, 250, 210);
+	drawLine(350, 310, 150, 150);
+	drawLine(180, 310, 150, 150);
+	drawLine(430, 310, 450, 410);
+
 
 	// ------------------------------------
 	drawCircle(500, 500, 50);
