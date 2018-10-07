@@ -18,7 +18,7 @@ const int g_image_width = g_windowWidth;
 const int g_image_height = g_windowHeight;
 
 std::vector<float> g_image;
-
+void circlePoints(int x0, int y0, int x, int y, int R);
 struct color
 {
 	unsigned char r, g, b;
@@ -256,12 +256,38 @@ void drawLine(int x1, int y1, int x2, int y2)
 		}
 	}
 }
+//Draw the pixel in all eight quadrants. Circle is semetric.
+void circlePoints(int x0, int y0, int x, int y, int R) {
+	putPixel(x0 + x, y + y0); // 1
+	putPixel(y + y0, x + x0); // 2
+	putPixel(x0 - x, y0 + y); // 8
+	putPixel(y0 + y, x0 - x); // 7
+	putPixel(x + x0, y0 - y); // 3
+	putPixel(y0 - y, x0 + x); // 4
+	putPixel(x0 - x, y0 - y); // 5
+	putPixel(y0 - y, x0 - x); // 6
+}
 
 void drawCircle(int x0, int y0, int R)
 {
 	// Task 2
 	// This function should draw a circle,
 	// where (x0, y0) is the center of the circle and R is the radius
+	int x, y, D;
+	x = 0; 
+	y = R;
+	D = 1 - R;
+	circlePoints(x0, y0, x, y, R);
+	while (y > x) {
+		if (D < 0) {
+			D += 2 * x + 3;
+		} else {
+			D += 2 * (x - y) + 5;
+			y--;
+		}
+		x++;
+		circlePoints(x0, y0, x, y, R);
+	}
 }
 
 void drawImage()
@@ -274,11 +300,11 @@ void drawImage()
 	drawLine(300, 410, 450, 310);
 
 	//Testing unidirectional line drawing
-	drawLine(150, 310, 160, 410);
-	drawLine(150, 310, 250, 410);
-	drawLine(350, 310, 150, 150);
-	drawLine(180, 310, 150, 150);
-	drawLine(430, 310, 450, 410);
+	//drawLine(150, 310, 160, 410);
+	//drawLine(150, 310, 250, 410);
+	//drawLine(350, 310, 150, 150);
+	//drawLine(180, 310, 150, 150);
+	//drawLine(430, 310, 450, 410);
 
 
 	// ------------------------------------
