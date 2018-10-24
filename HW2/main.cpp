@@ -172,7 +172,6 @@ void drawLine(int x1, int y1, int x2, int y2)
 	// This will only do a line from left to right, bottom up with slope of 45 deg.
 	int dy, dx, incroment_0, incroment_1, D;
 	if (x1 < x2 && std::abs(y2 - y1) <= std::abs(x2 - x1) && (y1 < y2 || y1 == y2)) {
-		std::cout << "derp" << std::endl;
 		dy = y2 - y1;
 		dx = x2 - x1;
 		D = 2 * dy - dx;
@@ -193,7 +192,6 @@ void drawLine(int x1, int y1, int x2, int y2)
 	}
 	//Vertical lines
 	else if ((x1 == x2) && (y1 < y2 || y1 > y2)) {
-		std::cout << "herp" << std::endl;
 		dy = y2 - y1;
 		dx = x2 - x1;
 		D = 2 * dy - dx;
@@ -213,7 +211,6 @@ void drawLine(int x1, int y1, int x2, int y2)
 	}
 	//negitive slope
 	else if (x1 > x2 && std::abs(y2 - y1) < std::abs(x2 - x1) && y1 < y2) {
-		std::cout << "herpderp" << std::endl;
 		dy = y2 - y1;
 		dx = x2 - x1;
 		D = 2 * dy - dx;
@@ -235,7 +232,6 @@ void drawLine(int x1, int y1, int x2, int y2)
 	}
 	//draw slop of <45 deg
 	if (x1 < x2 && std::abs(y2 - y1) > std::abs(x2 - x1) && y1 < y2) {
-		std::cout << "derp3" << std::endl;
 		dy = y2 - y1;
 		dx = x2 - x1;
 		D = 2 * dx - dy;
@@ -256,6 +252,7 @@ void drawLine(int x1, int y1, int x2, int y2)
 		}
 	}
 }
+
 //Draw the pixel in all eight quadrants. Circle is semetric.
 void circlePoints(int x0, int y0, int x, int y, int R) {
 	putPixel(x0 + x, y + y0); // 1
@@ -270,9 +267,7 @@ void circlePoints(int x0, int y0, int x, int y, int R) {
 
 void drawCircle(int x0, int y0, int R)
 {
-	// Task 2
-	// This function should draw a circle,
-	// where (x0, y0) is the center of the circle and R is the radius
+	//Draw the circle as if at the origin. Translate in the circlePoints function.
 	int x, y, D;
 	x = 0; 
 	y = R;
