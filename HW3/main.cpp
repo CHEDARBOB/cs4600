@@ -7,12 +7,23 @@
 #include <cmath>
 
 #define M_PI 3.141592654f
-
 unsigned int g_windowWidth = 800;
 unsigned int g_windowHeight = 600;
 char* g_windowName = "HW3-3D-Basics";
 
 GLFWwindow* g_window;
+//Struct for verticies
+struct vert {
+	float x;
+	float y;
+	float z;
+};
+
+struct norm {
+	float x;
+	float y;
+	float z;
+};
 
 // Model data
 std::vector<float> g_meshVertices;
@@ -66,6 +77,15 @@ void computeNormals()
 	for (int v = 0; v < g_meshNormals.size() / 3; ++v)
 	{
 		g_meshNormals[3 * v + 2] = 1.0;
+	}
+	//
+	for (int i = 0; i < g_meshVertices.size(); i+=3) {
+		float * a = g_meshVertices[i];
+		float * b = g_meshVertices[i + 3];
+		float * r = g_meshNormals[i];
+		crossProduct(a, b, r);
+		
+
 	}
 }
 
