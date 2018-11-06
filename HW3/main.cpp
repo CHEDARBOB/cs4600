@@ -12,18 +12,6 @@ unsigned int g_windowHeight = 600;
 char* g_windowName = "HW3-3D-Basics";
 
 GLFWwindow* g_window;
-//Struct for verticies
-struct vert {
-	float x;
-	float y;
-	float z;
-};
-
-struct norm {
-	float x;
-	float y;
-	float z;
-};
 
 // Model data
 std::vector<float> g_meshVertices;
@@ -37,9 +25,11 @@ bool teapotSpin = false;
 bool enableDolly = false;
 bool showCheckerboard = false;
 
-// Dolly zoom options 
-float fov = M_PI / 4.f;
+// Dolly zoom options
 float distance = 4.5f;
+float fov = M_PI / 4.f;
+float changedFOV = fov;
+float halfWidth = distance * std::tan(changedFOV / 2);
 
 // Auxiliary math functions
 float dotProduct(const float* a, const float* b)
@@ -47,6 +37,21 @@ float dotProduct(const float* a, const float* b)
 	return a[0] * b[0] + a[1] * b[1] + a[2] * b[2];
 }
 
+void computeVector(float * a, float * b, float * c, float * vectorA, float * vectorB) {
+	vectorA[0] = b[0] - a[0];
+	vectorA[1] = b[1] - a[1];
+	vectorA[2] = b[2] - a[2];
+	//
+	vectorB[0] = c[0] - a[0];
+	vectorB[1] = c[1] - a[1];
+	vectorB[2] = c[2] - a[2];
+}
+
+void addVertNorm(float * n, int index) {
+	g_meshNormals[index] += n[0];
+	g_meshNormals[index + 1] += n[1];
+	g_meshNormals[index + 2] += n[2];
+}
 void crossProduct(const float* a, const float* b, float* r)
 {
 	r[0] = a[1] * b[2] - a[2] * b[1];
@@ -72,20 +77,38 @@ void computeNormals()
 	g_meshNormals.resize(g_meshVertices.size());
 
 	// TASK 1
-	// The code below sets all normals to point in the z-axis, so we get a boring constant gray color
-	// The following should be replaced with your code for normal computation
-	for (int v = 0; v < g_meshNormals.size() / 3; ++v)
-	{
-		g_meshNormals[3 * v + 2] = 1.0;
+	//interate one triagle at a time.
+	for (size_t i = 0; i < g_meshIndices.size(); i++) {
+		//temp vectors for cross product
+		std::vector<float> A;
+		std::vector<float> B;
+		std::vector<float> norm;
+		A.resize(3);
+		B.resize(3);
+		norm.resize(3);
+		float * vectorA = &A[0];
+		float * vectorB = &B[0];
+		//get index of edge
+		unsigned int index = g_meshIndices[i];
+		//get all three verticies of the triangle. Also walk the indecies vector.
+		float * vertA = &g_meshVertices[3 * index];
+		unsigned int index2 = g_meshIndices[++i];
+		float * vertB = &g_meshVertices[3 * index2];
+		unsigned int index3 = g_meshIndices[++i];
+		float * vertC = &g_meshVertices[3 * index3];
+		//get two vectors from a, b, c.
+		computeVector(vertA, vertB, vertC, vectorA, vectorB);
+		//compute the normal of the triangle. 
+		float * n = &norm[0];
+		crossProduct(vectorA, vectorB, n);
+		//accumulate triagle face normals.
+		addVertNorm(n, 3 * index); // vertex 1
+		addVertNorm(n, 3 * index2); // vertex 2
+		addVertNorm(n, 3 * index3); // vertex 3
 	}
-	//
-	for (int i = 0; i < g_meshVertices.size(); i+=3) {
-		float * a = g_meshVertices[i];
-		float * b = g_meshVertices[i + 3];
-		float * r = g_meshNormals[i];
-		crossProduct(a, b, r);
-		
-
+	//normalize
+	for (int i = 0; i < g_meshNormals.size(); i+=3) {
+		normalize(&g_meshNormals[i]);
 	}
 }
 
@@ -134,6 +157,10 @@ double getTime()
 {
 	return glfwGetTime();
 }
+void setTime(float time) 
+{
+	glfwSetTime(time);
+}
 
 void glfwErrorCallback(int error, const char* description)
 {
@@ -145,30 +172,43 @@ void togglePerspective() {
 
 	glMatrixMode(GL_PROJECTION);
 	glLoadIdentity();
-
 	// Perspective Projection
 	if (enablePersp)
 	{
 		// Dolly zoom computation
 		if (enableDolly) {
 			// TASK 3
-			// Your code for dolly zoom computation goes here
-			// You can use getTime() to change fov over time
-			// distance should be recalculated here using the Equation 2 in the description file
+			//update FOV (in radians)
+			changedFOV -= getTime()/5000;
+			//update Distance
+			distance = halfWidth / std::tan(changedFOV / 2);
+			//convert to degrees.
+			float changedFOVInDrgree = radianToDegree(changedFOV);
+			if (distance <= 50 && distance >= 0) {
+				gluPerspective(changedFOVInDrgree, (GLfloat)g_windowWidth / (GLfloat)g_windowHeight, 1.0f, 50.f);
+				std::cout << "change in distance: " << distance << "\n" << "change in FOV: " << changedFOVInDrgree << std::endl;
+			}
+			else {
+				changedFOV = fov;
+				distance = 4.5f;
+				setTime(0.0f);
+			}
 		}
-
+		else {
+		distance = 4.5f;
 		float fovInDegree = radianToDegree(fov);
 		gluPerspective(fovInDegree, (GLfloat)g_windowWidth / (GLfloat)g_windowHeight, 1.0f, 40.f);
+		}
 	}
 	// Othogonal Projection
 	else
 	{
 		// Scale down the object for a better view in orthographic projection
-		glScalef(0.5, 0.5, 0.5);
+		//I changed the scale, because that just looked better to me.
+		glScalef(1.0f, 1.0f, 1.0f);
 
 		// TASK 3
-		// Your code for orthogonal projection goes here
-		// (Hint: you can use glOrtho() function in OpenGL)
+		glOrtho(-4.0f, 4.0f, -3.0f, 3.0f, 1.0f, 40.0f);
 	}
 }
 
@@ -293,18 +333,25 @@ void clearModelViewMatrix()
 void updateModelViewMatrix()
 {	
 	clearModelViewMatrix();
+	if (teapotSpin) {
+		//toggle spinning does not seem to work...It spins though.
+		g_modelViewMatrix[0] = std::cos(.5f * (getTime()));
+		g_modelViewMatrix[2] = std::sin(.5f * (getTime()));
+		g_modelViewMatrix[8] = -std::sin(.5f * (getTime()));
+		g_modelViewMatrix[5] = 1.0f;
+		g_modelViewMatrix[10] = std::cos(.5f * (getTime()));
 
-	// TASK 2
-	// The following code sets a static modelView matrix
-	// This should be replaced with code implementing Task 2
-	// You can use getTime() to change rotation over time
+		g_modelViewMatrix[14] = -distance;
+		g_modelViewMatrix[15] = 1.0f;
+	}
+	else {
+		g_modelViewMatrix[0] = 1.0f;
+		g_modelViewMatrix[5] = 1.0f;
+		g_modelViewMatrix[10] = 1.0f;
 
-	g_modelViewMatrix[0] = 1.0f;
-	g_modelViewMatrix[5] = 1.0f;
-	g_modelViewMatrix[10] = 1.0f;
-
-	g_modelViewMatrix[14] = -distance;
-	g_modelViewMatrix[15] = 1.0f;
+		g_modelViewMatrix[14] = -distance;
+		g_modelViewMatrix[15] = 1.0f;
+	}
 }
 
 void setModelViewMatrix()
