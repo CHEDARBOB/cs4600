@@ -478,6 +478,11 @@ void computeJointTransformations(
 	std::vector<Matrix4f>& p_global)
 {
 	// TASK 1 comes here
+	//input the root into the global rig
+	p_global[0] = p_offset[0] * p_local[0];
+	for (int j = 1; j < p_numJoints; j++) {
+		p_global[j] = p_global[p_jointParent[j]] * p_offset[j] * p_local[j];
+	}
 }
 
 void skinning(
