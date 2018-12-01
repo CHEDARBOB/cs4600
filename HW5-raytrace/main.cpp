@@ -13,7 +13,6 @@ using namespace Eigen;
 
 // image background color
 Vector3f bgcolor(1.0f, 1.0f, 1.0f);
-
 // lights in the scene
 std::vector<Vector3f> lightPositions = { Vector3f(  0.0, 60, 60)
                                        , Vector3f(-60.0, 60, 60)
@@ -80,16 +79,38 @@ Vector3f phong(const Vector3f &L, // direction vector from the point on the surf
 
 	return resColor;
 }
-
+//This is a ray or line.
 Vector3f trace(
 	const Vector3f &rayOrigin,
 	const Vector3f &rayDirection,
 	const std::vector<Sphere> &spheres)
 {
-	Vector3f pixelColor = Vector3f::Zero();
-
-	// TODO: implement ray tracing as described in the homework description
-
+	Vector3f pixelColor = bgcolor;
+	Vector3f point;
+	float t0, t1, smol;
+	bool rayIntersect, firstSphere = true;
+	//implement ray tracing as described in the homework description
+	for each (Vector3f lights in lightPositions) {
+		for each (Sphere sphere in spheres) {
+			//Did ray intersect any spheres?
+			rayIntersect = sphere.intersect(rayOrigin, rayDirection, t0, t1);
+			if (rayIntersect) {
+				//the first sphere intersected setting smol. The currently smallest t0. 
+				if (firstSphere) {
+					smol = t0;
+					firstSphere = false;
+					
+					pixelColor = sphere.surfaceColor;
+				}
+				//Was there another sphere intersected by the line? If so, is t0 smaller than smol?
+				else if (smol > t0) {
+					smol = t0; //if t0 is smaller than smol.
+					pixelColor = sphere.surfaceColor;
+				}
+			}
+		}
+		//find light intensity of final pixel color.
+	}
 	return pixelColor;
 }
 
