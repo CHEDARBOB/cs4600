@@ -14,9 +14,9 @@ using namespace Eigen;
 // image background color
 Vector3f bgcolor(1.0f, 1.0f, 1.0f);
 // lights in the scene
-std::vector<Vector3f> lightPositions = { Vector3f(  0.0, 60, 60)
-                                       , Vector3f(-60.0, 60, 60)
-                                       , Vector3f( 60.0, 60, 60) };
+std::vector<Vector3f> lightPositions = { Vector3f(0.0, 140, 60)
+									   , Vector3f(-60.0, 60, 60)
+									   , Vector3f(60.0, 60, 60 ) }; //creating area light.
 
 class Sphere
 {
@@ -57,7 +57,7 @@ Vector3f diffuse(const Vector3f &L, // direction vector from the point on the su
 	)
 {
 	Vector3f resColor = Vector3f::Zero();
-	resColor = 0.333 * kd * std::max(L.dot(N), 0.0f) * diffuseColor;
+	resColor = 0.25 * kd * std::max(L.dot(N), 0.0f) * diffuseColor;
 	// TODO: implement diffuse shading model
 
 	return resColor;
@@ -80,7 +80,7 @@ Vector3f phong(const Vector3f &L, // direction vector from the point on the surf
 	//reflection ray
 	R = (2 * N) * (std::max(N.dot(L), 0.0f)) - L;
 	//Specular lighting
-	Es = .333 * specularColor * ks * (pow (std::max(R.dot(V), 0.0f), alpha));
+	Es = .25 * specularColor * ks * (pow (std::max(R.dot(V), 0.0f), alpha));
 	return Ed + Es;
 }
 //
@@ -138,7 +138,7 @@ Vector3f trace(
 	const Vector3f &rayDirection,
 	const std::vector<Sphere> &spheres, int depth)
 {
-	int maxDepth = 0;
+	int maxDepth = 2;
 	bool isSpecular;
 	Sphere sphere(Vector3f::Zero(), 0, Vector3f::Zero());
 	Vector3f pixelColor = Vector3f::Zero();
